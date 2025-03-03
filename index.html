@@ -1,0 +1,226 @@
+    <!doctype html>
+    <html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>Los Booleanos</title>
+        <!-- CSS FILES -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/bootstrap-icons.css" rel="stylesheet">
+        <link href="css/templatemo-kind-heart-charity.css" rel="stylesheet">
+        <style>
+            /* Inline CSS to override default styles */
+            .navbar.bg-light {
+                background-color: #0056b3 !important; /* Darker blue for navbar */
+            }
+            .navbar .nav-link {
+                color: white !important;
+            }
+            .navbar .nav-link:hover {
+                color: #cce5ff !important; /* Light blue hover */
+            }
+            .navbar-brand span {
+                color: white !important;
+            }
+            .navbar-brand span small {
+                color: #e6f0ff !important; /* Lighter blue for "An Innovative Product" */
+            }
+            .custom-btn {
+                background-color: #003d82 !important; /* Darker blue for buttons */
+                border-color: #003d82 !important;
+                color: white !important;
+            }
+            .custom-btn:hover {
+                background-color: #002a5c !important; /* Even darker blue on hover */
+                border-color: #002a5c !important;
+            }
+            .site-footer {
+                background-color: #002a5c !important; /* Darker blue for footer */
+            }
+            .site-footer .text-white,
+            .site-footer .site-footer-link,
+            .site-footer h5 {
+                color: #cce5ff !important; /* Light blue text for all footer text */
+            }
+            .site-footer-bottom {
+                background-color: #001f47 !important; /* Darker blue for footer bottom */
+            }
+            .site-footer-bottom .text-white {
+                color: #cce5ff !important; /* Ensure footer bottom text matches */
+            }
+            #top {
+                background-image: url('images/device.jpg');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                min-height: 500px; /* Ensure the section is tall enough to show the background */
+                color: white !important; /* Explicitly white text for contrast */
+                position: relative; /* For pseudo-element positioning */
+            }
+            #top::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: inherit; /* Inherit the background image */
+                filter: blur(5px); /* Add blur effect */
+                z-index: 1; /* Place behind content */
+            }
+            #top .container {
+                position: relative;
+                z-index: 2; /* Ensure content stays above blurred background */
+            }
+            #top h2,
+            #top p {
+                color: white !important; /* Ensure text stays white */
+                -webkit-text-stroke: 1px black; /* Black border around text */
+                text-stroke: 1px black; /* Standard property for some browsers */
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Enhanced shadow for contrast */
+            }
+            #top .custom-btn {
+                background-color: #003d82 !important;
+                border-color: #003d82 !important;
+            }
+            #top .custom-btn:hover {
+                background-color: #002a5c !important;
+                border-color: #002a5c !important;
+            }
+            #section_2 img {
+                max-width: 300px; /* Reduce the size of website.jpg */
+                height: auto; /* Maintain aspect ratio */
+            }
+
+            .discover-box {
+                background-color: white; /* Fill the box with white */
+                color: black !important; /* Change text color for contrast */
+                border: 2px solid black; /* Add a black border */
+                padding: 15px; /* Add space inside the box */
+                display: inline-block; /* Keep it compact */
+                text-align: center;
+                font-weight: bold; /* Make text stand out */
+                border-radius: 5px; /* Optional: Slightly rounded corners */
+            }
+            
+        </style>
+    </head>
+
+    <body id="section_1">
+        <nav class="navbar navbar-expand-lg bg-light shadow-lg">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">
+                    <img src="images/logo.png" class="logo img-fluid" alt="Kind Heart Charity">
+                    <span>
+                        Los Booleanos
+                        <small>An Innovative Product</small>
+                    </span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link click-scroll" href="#top">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link click-scroll" href="#section_2">About</a>
+                        </li>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link custom-btn custom-border-btn btn" href="buynow.html">Buy Now</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main>
+            <!-- Home Section -->
+            <section id="top" class="section-padding">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 col-12 text-center">
+                            <h2>Welcome to Los Booleanos</h2>
+                            <p class="lead mt-3 discover-box">
+                                Discover how logic gates work through connecting to Los Booleanos’ device WiFi. Explore the fundamentals of digital circuits with this innovative tool.
+                            </p>
+                            
+                            
+                            <a href="buynow.html" class="custom-btn btn mt-4">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="section_2" class="section-padding section-bg">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6 col-12">
+                            <h2>About Us</h2>
+                            <p class="mt-3">
+                                BDM is a startup company planning to create new devices to let people interact with technologies and learn new concepts. Our vision is to make technology accessible and educational for everyone.
+                            </p>
+                            <p>
+                                Based in Zamboanga City, we are committed to innovation, pushing the boundaries of what’s possible and inspiring the next generation of learners and creators.
+                            </p>
+                        </div>
+                        <div class="col-lg-6 col-12 mt-4 mt-lg-0">
+                            <img src="images/website.jpg" class="img-fluid" alt="About Los Booleanos">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3 col-12 mb-4">
+                        <!-- Removed the logo image here -->
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-12 mx-auto">
+                        <h5 class="site-footer-title mb-3">Contact Information</h5>
+                        <p class="text-white d-flex mb-2">
+                            <a href="tel: 0992-465-5513" class="site-footer-link">
+                                0992-465-5513
+                            </a>
+                        </p>
+                        <p class="text-white d-flex">
+                            <a href="mailto:info@yourgmail.com" class="site-footer-link">
+                                BDM@los.com
+                            </a>
+                        </p>
+                        <p class="text-white d-flex mt-3">
+                            Zamboanga City
+                        </p>
+                        <a href="#" class="custom-btn btn mt-3">Get Direction</a>
+                    </div>
+                </div>
+            </div>
+            <div class="site-footer-bottom">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-5 col-12 mx-auto" style="text-align: center;">
+                            <p class="text-white mb-0">Los Booleanos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- JAVASCRIPT FILES -->
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/jquery.sticky.js"></script>
+        <script src="js/click-scroll.js"></script>
+        <script src="js/counter.js"></script>
+        <script src="js/custom.js"></script>
+    </body>
+
+    </html>

@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Los Booleanos</title>
+    <!-- CSS FILES -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/templatemo-kind-heart-charity.css" rel="stylesheet">
+    <style>
+        /* Inline CSS to override default styles */
+        .navbar.bg-light {
+            background-color: #0056b3 !important; /* Darker blue for navbar */
+        }
+        .navbar .nav-link {
+            color: white !important;
+        }
+        .navbar .nav-link:hover {
+            color: #cce5ff !important; /* Light blue hover */
+        }
+        .navbar-brand span {
+            color: white !important;
+        }
+        .navbar-brand span small {
+            color: #e6f0ff !important; /* Lighter blue for "An Innovative Product" */
+        }
+        .custom-btn {
+            background-color: #003d82 !important; /* Darker blue for buttons */
+            border-color: #003d82 !important;
+            color: white !important;
+        }
+        .custom-btn:hover {
+            background-color: #002a5c !important; /* Even darker blue on hover */
+            border-color: #002a5c !important;
+        }
+        .site-footer {
+            background-color: #002a5c !important; /* Darker blue for footer */
+        }
+        .site-footer .text-white,
+        .site-footer .site-footer-link,
+        .site-footer h5 {
+            color: #cce5ff !important; /* Light blue text for all footer text */
+        }
+        .site-footer-bottom {
+            background-color: #001f47 !important; /* Darker blue for footer bottom */
+        }
+        .site-footer-bottom .text-white {
+            color: #cce5ff !important; /* Ensure footer bottom text matches */
+        }
+        .donate-section {
+            background-image: url('images/device.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 600px; /* Ensure the section is tall enough */
+            position: relative; /* For pseudo-element positioning */
+            padding: 40px 0; /* Add padding */
+        }
+        .donate-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit; /* Inherit the background image */
+            filter: blur(5px); /* Add blur effect */
+            z-index: 1; /* Place behind content */
+        }
+        .donate-section .container {
+            position: relative;
+            z-index: 2; /* Ensure content stays above blurred background */
+        }
+        .donate-form {
+            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white for readability */
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .footer-contact {
+            text-align: center; /* Center the contact information */
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-light shadow-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="images/logo.png" class="logo img-fluid" alt="">
+                <span>
+                    Los Booleanos
+                    <small>An Innovative Product</small>
+                </span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="index.html#section_1">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="index.html#section_2">About</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a class="nav-link custom-btn custom-border-btn btn" href="donate.html">Buy Now</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="donate-section">
+            <div class="section-overlay"></div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-12 mx-auto">
+                        <form class="custom-form donate-form" action="#" method="get" role="form">
+                            <h3 class="mb-4">Purchase Los Booleanos</h3>
+                            <div class="row">
+                                <div class="col-lg-12 col-12">
+                                    <h5 class="mb-3">Quantity</h5>
+                                </div>
+                                <div class="col-lg-6 col-12">
+                                    <div class="input-group">
+                                        <input type="number" name="quantity" id="quantity" class="form-control"
+                                            min="1" value="1" required>
+                                        <span class="input-group-text">Unit Price: 1000 PHP</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-12 mt-4">
+                                    <h5 class="mb-3">Personal Information</h5>
+                                </div>
+                                <div class="col-lg-6 col-12 mt-2">
+                                    <input type="text" name="name" id="name" class="form-control"
+                                        placeholder="Your Name" required>
+                                </div>
+                                <div class="col-lg-6 col-12 mt-2">
+                                    <input type="email" name="email" id="email" pattern="[^ @]*@[^ @]*"
+                                        class="form-control" placeholder="Your Email" required>
+                                </div>
+                                <div class="col-lg-12 col-12 mt-2">
+                                    <input type="text" name="address" id="address" class="form-control"
+                                        placeholder="Your Address" required>
+                                </div>
+
+                                <div class="col-lg-12 col-12 mt-4">
+                                    <h5 class="mb-3">WiFi Configuration</h5>
+                                </div>
+                                <div class="col-lg-6 col-12 mt-2">
+                                    <input type="text" name="wifi-name" id="wifi-name" class="form-control" placeholder="Preferred WiFi Name" required>
+                                </div>
+                                <div class="col-lg-6 col-12 mt-2">
+                                    <input type="password" name="wifi-password" id="wifi-password" class="form-control" placeholder="WiFi Password" required>
+                                </div>
+                                
+                                <div class="col-lg-12 col-12 mt-4">
+                                    <p class="mb-2">Shipping Fee: 200 PHP</p>
+                                    <p class="mb-4" id="total-cost">Total: <span id="total-amount">1200 PHP</span></p>
+                                    <button type="submit" class="form-control">Place Order</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-12 mx-auto footer-contact">
+                    <h5 class="site-footer-title mb-3">Contact Information</h5>
+                    <p class="text-white d-flex mb-2 justify-content-center">
+                        <a href="tel: 0992-465-5513" class="site-footer-link">
+                            0992-465-5513
+                        </a>
+                    </p>
+                    <p class="text-white d-flex mb-2 justify-content-center">
+                        <a href="mailto:info@yourgmail.com" class="site-footer-link">
+                            BDM@los.com
+                        </a>
+                    </p>
+                    <p class="text-white d-flex mt-3 justify-content-center">
+                        Zamboanga City
+                    </p>
+                    <a href="#" class="custom-btn btn mt-3">Get Direction</a>
+                </div>
+            </div>
+        </div>
+        <div class="site-footer-bottom">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-md-5 col-12 mx-auto" style="text-align: center;">
+                        <p class="text-white mb-0">Los Booleanos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT FILES -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.sticky.js"></script>
+    <script src="js/counter.js"></script>
+    <script src="js/custom.js"></script>
+    <script>
+        // JavaScript to update total cost dynamically
+        document.getElementById('quantity').addEventListener('input', function () {
+            const quantity = parseInt(this.value) || 0;
+            const unitPrice = 1000; // PHP per item
+            const shippingFee = 200; // PHP
+            const total = (quantity * unitPrice) + shippingFee;
+            document.getElementById('total-amount').textContent = total + ' PHP';
+        });
+    </script>
+</body>
+
+</html>
