@@ -83,6 +83,17 @@
         .footer-contact {
             text-align: center; /* Center the contact information */
         }
+        #total-amount {
+            font-weight: bold;
+            color: #003d82;
+        }
+        @media (max-width: 768px) {
+        .input-group {
+            flex-direction: column;
+            align-items: stretch;
+    }
+}
+
     </style>
 </head>
 
@@ -139,8 +150,7 @@
                                     <h5 class="mb-3">Personal Information</h5>
                                 </div>
                                 <div class="col-lg-6 col-12 mt-2">
-                                    <input type="text" name="name" id="name" class="form-control"
-                                        placeholder="Your Name" required>
+                                    <input type="text" name="name" id="name" class="form-control" placeholder="Your Name" required aria-label="Your Name">
                                 </div>
                                 <div class="col-lg-6 col-12 mt-2">
                                     <input type="email" name="email" id="email" pattern="[^ @]*@[^ @]*"
