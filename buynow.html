@@ -133,48 +133,47 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-6 col-12 mx-auto">
-                        <form class="custom-form donate-form" action="#" method="get" role="form">
+                        <form class="custom-form donate-form" action="https://formspree.io/f/manenovn" method="POST">
                             <h3 class="mb-4">Purchase Los Booleanos</h3>
+                        
                             <div class="row">
                                 <div class="col-lg-12 col-12">
                                     <h5 class="mb-3">Quantity</h5>
                                 </div>
                                 <div class="col-lg-6 col-12">
                                     <div class="input-group">
-                                        <input type="number" name="quantity" id="quantity" class="form-control"
-                                            min="1" value="1" required>
+                                        <input type="number" name="quantity" id="quantity" class="form-control" min="1" value="1" required>
                                         <span class="input-group-text">Unit Price: 500 PHP</span>
                                     </div>
                                 </div>
+                        
                                 <div class="col-lg-12 col-12 mt-4">
                                     <h5 class="mb-3">Personal Information</h5>
                                 </div>
                                 <div class="col-lg-6 col-12 mt-2">
-                                    <input type="text" name="name" id="name" class="form-control" placeholder="Your Name" required aria-label="Your Name">
+                                    <input type="text" name="name" class="form-control" placeholder="Your Name" required>
                                 </div>
                                 <div class="col-lg-6 col-12 mt-2">
-                                    <input type="email" name="email" id="email" pattern="[^ @]*@[^ @]*"
-                                        class="form-control" placeholder="Your Email" required>
+                                    <input type="email" name="email" pattern="[^ @]*@[^ @]*" class="form-control" placeholder="Your Email" required>
                                 </div>
                                 <div class="col-lg-12 col-12 mt-2">
-                                    <input type="text" name="address" id="address" class="form-control"
-                                        placeholder="Your Address" required>
+                                    <input type="text" name="address" class="form-control" placeholder="Your Address" required>
                                 </div>
-
+                        
                                 <div class="col-lg-12 col-12 mt-4">
                                     <h5 class="mb-3">WiFi Configuration</h5>
                                 </div>
                                 <div class="col-lg-6 col-12 mt-2">
-                                    <input type="text" name="wifi-name" id="wifi-name" class="form-control" placeholder="Preferred WiFi Name" maxlength="32" required>
+                                    <input type="text" name="wifi-name" class="form-control" placeholder="Preferred WiFi Name" required>
                                 </div>
                                 <div class="col-lg-6 col-12 mt-2">
-                                    <input type="password" name="wifi-password" id="wifi-password" class="form-control" placeholder="WiFi Password (Min 8 chars)" minlength="8" required>
+                                    <input type="password" name="wifi-password" class="form-control" placeholder="WiFi Password" required>
                                 </div>
-                                
+                        
                                 <div class="col-lg-12 col-12 mt-4">
-                                    <span class="input-group-text">Unit Price: 500 PHP</span>
                                     <p class="mb-2">Shipping Fee: 50 PHP</p>
-                                    <p class="mb-4" id="total-cost">Total: <span id="total-amount">550 PHP</span></p>
+                                    <p class="mb-4">Total: <span id="total-amount">550 PHP</span></p>
+                                    <input type="hidden" name="total-cost" id="total-cost" value="550"> <!-- Hidden total field -->
                                     <button type="submit" class="form-control">Place Order</button>
                                 </div>
                             </div>
@@ -226,17 +225,15 @@
     <script src="js/custom.js"></script>
     <script>
         // JavaScript to update total cost dynamically
-        document.getElementById('quantity').addEventListener('input', function () {
-            const quantity = parseInt(this.value) || 0;
-            const unitPrice = 500; // PHP per item
-            const shippingFee = 50; // PHP
-            const total = (quantity * unitPrice) + shippingFee;
-            document.getElementById('total-amount').textContent = total + ' PHP';
-        });
+    document.getElementById('quantity').addEventListener('input', function () {
+        const quantity = parseInt(this.value) || 0;
+        const unitPrice = 500; // PHP per item
+        const shippingFee = 50; // PHP
+        const total = (quantity * unitPrice) + shippingFee;
 
-        window.onload = function () {
-        document.getElementById('total-amount').textContent = (500 + 50) + ' PHP';
-    };
+        document.getElementById('total-amount').textContent = total + ' PHP';
+        document.getElementById('total-cost').value = total; // Update hidden input field
+    });
 
     </script>
 </body>
