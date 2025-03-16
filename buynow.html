@@ -227,11 +227,16 @@
         // JavaScript to update total cost dynamically
         document.getElementById('quantity').addEventListener('input', function () {
             const quantity = parseInt(this.value) || 0;
-            const unitPrice = 1000; // PHP per item
-            const shippingFee = 200; // PHP
+            const unitPrice = 500; // PHP per item
+            const shippingFee = 50; // PHP
             const total = (quantity * unitPrice) + shippingFee;
             document.getElementById('total-amount').textContent = total + ' PHP';
         });
+
+        window.onload = function () {
+        document.getElementById('total-amount').textContent = (500 + 50) + ' PHP';
+    };
+    
     </script>
 </body>
 
