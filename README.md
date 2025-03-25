@@ -17,16 +17,16 @@ This is the official website for Los Booleanos, hosted on GitHub Pages. The webs
 ## Files
 
 - **index.html**: The main landing page of the website.
-- **buynow.html**: A page with information on how to buy our products.
+- **admin_los_booleanos.html**: Admin panel for managing announcements, appointments, and other data.
+- **buy_orders_products.html**: Page for managing buy orders and product listings.
 - **css/**: Directory containing CSS files for styling the website.
 - **js/**: Directory containing JavaScript files for interactivity.
 
 ## How to Access
 
-You can access the hosted website using the following URLs:
+You can access the hosted website using the following URL:
 
 - [Main Page](https://losbooleanos.github.io/)
-- [Buy Now Page](https://losbooleanos.github.io/buynow.html)
 
 ## Contributing
 
