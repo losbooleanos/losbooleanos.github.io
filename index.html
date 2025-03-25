@@ -1,43 +1,44 @@
-    <!doctype html>
-    <html lang="en">
+<!doctype html>
+<html lang="en">
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <title>Los Booleanos</title>
-        <!-- CSS FILES -->
-        <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/bootstrap-icons.css" rel="stylesheet">
-        <link href="css/templatemo-kind-heart-charity.css" rel="stylesheet">
-        <style>
-            /* Inline CSS to override default styles */
-            .navbar.bg-light {
-                background-color: #0056b3 !important; /* Darker blue for navbar */
-            }
-            .navbar .nav-link {
-                color: white !important;
-            }
-            .navbar .nav-link:hover {
-                color: #cce5ff !important; /* Light blue hover */
-            }
-            .navbar-brand span {
-                color: white !important;
-            }
-            .navbar-brand span small {
-                color: #e6f0ff !important; /* Lighter blue for "An Innovative Product" */
-            }
-            .custom-btn {
-                background-color: #003d82 !important; /* Darker blue for buttons */
-                border-color: #003d82 !important;
-                color: white !important;
-            }
-            .custom-btn:hover {
-                background-color: #002a5c !important; /* Even darker blue on hover */
-                border-color: #002a5c !important;
-            }
-            .site-footer {
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Los Booleanos</title>
+    
+    <!-- CSS FILES -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/templatemo-kind-heart-charity.css" rel="stylesheet">
+    <style>
+
+.navbar.bg-light {
+            background-color: #0056b3 !important;
+        }
+        .navbar .nav-link {
+            color: white !important;
+        }
+        .navbar .nav-link:hover {
+            color: #cce5ff !important;
+        }
+        .navbar-brand span {
+            color: white !important;
+        }
+        .navbar-brand span small {
+            color: #e6f0ff !important;
+        }
+        .custom-btn {
+            background-color: #003d82 !important;
+            border-color: #003d82 !important;
+            color: white !important;
+        }
+        .custom-btn:hover {
+            background-color: #002a5c !important;
+            border-color: #002a5c !important;
+        }
+        .site-footer {
                 background-color: #002a5c !important; /* Darker blue for footer */
             }
             .site-footer .text-white,
@@ -51,185 +52,588 @@
             .site-footer-bottom .text-white {
                 color: #cce5ff !important; /* Ensure footer bottom text matches */
             }
-            #top {
-                background-image: url('images/device.jpg');
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                min-height: 500px; /* Ensure the section is tall enough to show the background */
-                color: white !important; /* Explicitly white text for contrast */
-                position: relative; /* For pseudo-element positioning */
-            }
-            #top::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: inherit; /* Inherit the background image */
-                filter: blur(5px); /* Add blur effect */
-                z-index: 1; /* Place behind content */
-            }
-            #top .container {
-                position: relative;
-                z-index: 2; /* Ensure content stays above blurred background */
-            }
-            #top h2,
-            #top p {
-                color: white !important; /* Ensure text stays white */
-                -webkit-text-stroke: 1px black; /* Black border around text */
-                text-stroke: 1px black; /* Standard property for some browsers */
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Enhanced shadow for contrast */
-            }
-            #top .custom-btn {
-                background-color: #003d82 !important;
-                border-color: #003d82 !important;
-            }
-            #top .custom-btn:hover {
-                background-color: #002a5c !important;
-                border-color: #002a5c !important;
-            }
-            #section_2 img {
-                max-width: 300px; /* Reduce the size of website.jpg */
-                height: auto; /* Maintain aspect ratio */
+        #top {
+            background-image: url('images/device.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 500px;
+            color: white !important;
+            position: relative;
+        }
+        #top::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            filter: blur(5px);
+            z-index: 1;
+        }
+        #top .container {
+            position: relative;
+            z-index: 2;
+        }
+        #top h2,
+        #top p {
+            color: white !important;
+            -webkit-text-stroke: 1px black;
+            text-stroke: 1px black;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        .discover-box {
+            background-color: white;
+            color: black !important;
+            border: 2px solid black;
+            padding: 15px;
+            display: inline-block;
+            text-align: center;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+        
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-upcoming { background-color: red; color: white; }
+        .status-ongoing { background-color: green; color: white; }
+    
+
+    </style>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC3QJbDL7cmyJf8sJjephTn8C7w5yXJqBc",
+        authDomain: "los-booleanos.firebaseapp.com",
+        projectId: "los-booleanos",
+        storageBucket: "los-booleanos.appspot.com",
+        messagingSenderId: "389775660083",
+        appId: "1:389775660083:web:4d283686b8ddfa9f843f46",
+        measurementId: "G-P8NKQS9LX4"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app, "gs://los-booleanos.firebasestorage.app");
+
+    async function loadProducts() {
+        console.log("Fetching products...");
+        const productsContainer = document.getElementById("products-container");
+        if (!productsContainer) {
+            console.error("products-container not found in index.html");
+            return;
+        }
+        productsContainer.innerHTML = ""; // Clear container before loading
+
+        const querySnapshot = await getDocs(collection(db, "products"));
+
+        if (querySnapshot.empty) {
+            console.log("No products found in Firestore.");
+            productsContainer.innerHTML = "<p>No products available.</p>";
+            return;
+        }
+
+        for (const doc of querySnapshot.docs) {
+            const data = doc.data();
+            console.log("Product Data:", data);
+
+            const name = data.name ?? "Unknown";
+            const price = data.price ? `₱${parseFloat(data.price).toFixed(2)}` : "₱0.00";
+            const stock = data.stock ?? 0;
+            let imageUrl = "https://firebasestorage.googleapis.com/v0/b/los-booleanos.appspot.com/o/default%2FNo_image_available.png?alt=media";
+
+            if (data.imageUrl) {
+                if (data.imageUrl.startsWith("https://")) {
+                    imageUrl = data.imageUrl;
+                } else {
+                    try {
+                        imageUrl = await getDownloadURL(ref(storage, data.imageUrl));
+                    } catch (error) {
+                        console.error("Error fetching image:", error);
+                    }
+                }
             }
 
-            .discover-box {
-                background-color: white; /* Fill the box with white */
-                color: black !important; /* Change text color for contrast */
-                border: 2px solid black; /* Add a black border */
-                padding: 15px; /* Add space inside the box */
-                display: inline-block; /* Keep it compact */
-                text-align: center;
-                font-weight: bold; /* Make text stand out */
-                border-radius: 5px; /* Optional: Slightly rounded corners */
-            }
-            
-        </style>
-    </head>
+            const productCard = `
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="${imageUrl}" class="card-img-top" alt="${name}">
+                        <div class="card-body">
+                            <h5 class="card-title">${name}</h5>
+                            <p class="card-text">Price: ${price}</p>
+                            <p class="card-text">Stock: ${stock}</p>
+                            <button 
+                                class="btn btn-sm btn-success buy-now-btn" 
+                                data-product-id="${doc.id}" 
+                                data-product-name="${name}" 
+                                data-product-price="${price}">
+                                Buy
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+                productsContainer.insertAdjacentHTML("beforeend", productCard);
+        }
 
-    <body id="section_1">
-        <nav class="navbar navbar-expand-lg bg-light shadow-lg">
-            <div class="container">
-                <a class="navbar-brand" href="index.html">
-                    <img src="images/logo.png" class="logo img-fluid" alt="Kind Heart Charity">
-                    <span>
-                        Los Booleanos
-                        <small>An Innovative Product</small>
-                    </span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#top">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link click-scroll" href="#section_2">About</a>
-                        </li>
-                        <li class="nav-item ms-3">
-                            <a class="nav-link custom-btn custom-border-btn btn" href="buynow.html">Buy our first product!</a>
-                        </li>
-                    </ul>
+        setTimeout(() => {
+            document.querySelectorAll(".buy-now-btn").forEach(button => {
+                button.addEventListener("click", (event) => {
+                    const productId = event.target.getAttribute("data-product-id");
+                    const productName = event.target.getAttribute("data-product-name");
+                    const productPrice = event.target.getAttribute("data-product-price");
+
+                    console.log("Buying product:", productId, productName, productPrice);
+                    openBuyOrderModal(productId, productName, productPrice);
+                });
+            });
+        }, 1000);
+    }
+
+    document.getElementById("submitOrder").addEventListener("click", async function () {
+    const productId = document.getElementById("modal-product-id").value;
+    const productName = document.getElementById("modal-product-name").value;
+    const productPrice = parseFloat(document.getElementById("modal-product-price").value.replace(/[^\d.]/g, ""));
+    const quantity = parseInt(document.getElementById("orderQuantity").value);
+    const totalCost = (productPrice * quantity) + 50;
+    
+    const customerName = document.getElementById("customerName").value;
+    const customerAddress = document.getElementById("customerAddress").value;
+    const customerEmail = document.getElementById("customerEmail").value;
+
+    if (!customerName || !customerAddress || !customerEmail || isNaN(quantity) || quantity < 1) {
+        alert("Please fill in all details correctly.");
+        return;
+    }
+
+    const newOrder = {
+        customerName,
+        customerAddress,
+        customerEmail,
+        productId,
+        productName,
+        quantity,
+        totalCost,
+        status: "Pending"
+    };
+
+    try {
+        await addDoc(collection(db, "buyOrders"), newOrder);
+        alert("Order placed successfully!");
+        bootstrap.Modal.getInstance(document.getElementById("buyOrderModal")).hide();
+    } catch (error) {
+        console.error("Error placing order:", error);
+        alert("Error placing order. Please try again.");
+    }
+});
+
+
+    function openBuyOrderModal(productId, productName, productPrice) {
+    console.log("Opening buy order modal:", productId, productName, productPrice);
+
+    const modalProductId = document.getElementById("modal-product-id");
+    const modalProductName = document.getElementById("modal-product-name");
+    const modalProductPrice = document.getElementById("modal-product-price");
+    const totalCostInput = document.getElementById("totalCost");
+    const quantityInput = document.getElementById("orderQuantity");
+
+    if (!modalProductId || !modalProductName || !modalProductPrice || !totalCostInput || !quantityInput) {
+        console.error("One or more modal elements not found.");
+        return;
+    }
+
+    // Convert productPrice to a string before using replace()
+    const numericPrice = parseFloat(String(productPrice).replace(/[^\d.]/g, '')) || 0;
+
+    modalProductId.value = productId;
+    modalProductName.value = productName;
+    modalProductPrice.value = productPrice; // Show only numeric value
+
+    // Set default quantity
+    quantityInput.value = 1;
+
+    // Calculate initial total cost (including ₱50 shipping)
+    const shippingFee = 50;
+    totalCostInput.value = `₱${(numericPrice * 1 + shippingFee).toFixed(2)}`;
+
+    // Show modal
+    const buyOrderModal = new bootstrap.Modal(document.getElementById("buyOrderModal"));
+    buyOrderModal.show();
+}
+
+
+
+
+document.getElementById("orderQuantity").addEventListener("input", function () {
+    const priceText = document.getElementById("modal-product-price").value;
+    const price = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0; // Remove non-numeric characters
+    const quantity = parseInt(this.value) || 0;
+    const shippingFee = 50;
+    const totalCostInput = (price * quantity) + shippingFee;;
+
+    if (quantity > 0) {
+        totalCostInput.value = `₱${(price * quantity + shippingFee).toFixed(2)}`;
+    } else {
+        totalCostInput.value = "₱50.00"; // Minimum cost is shipping fee
+    }
+});
+
+
+
+
+
+
+async function loadAnnouncements() {
+    console.log("Fetching announcements...");
+    const announcementsContainer = document.getElementById("announcements-container");
+    if (!announcementsContainer) {
+        console.error("announcements-container not found in index.html");
+        return;
+    }
+    announcementsContainer.innerHTML = "";
+
+    const querySnapshot = await getDocs(collection(db, "announcements"));
+    if (querySnapshot.empty) {
+        console.log("No announcements found in Firestore.");
+        announcementsContainer.innerHTML = "<p>No announcements available.</p>";
+        return;
+    }
+
+    let announcements = [];
+    querySnapshot.forEach(doc => {
+        const data = doc.data();
+        announcements.push({
+            title: data.title ?? "Untitled Announcement",
+            description: data.description ?? "No description available.",
+            date: data.date ? new Date(data.date).toLocaleDateString() : "Unknown Date",
+            status: data.status ?? "Upcoming"
+        });
+    });
+
+    // Create Bootstrap Carousel
+    let carouselHTML = `
+        <div id="announcementCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+    `;
+
+    announcements.forEach((announcement, index) => {
+        let statusBadgeClass = "bg-danger";
+        if (announcement.status.toLowerCase() === "ongoing") statusBadgeClass = "bg-success";
+        if (announcement.status.toLowerCase() === "completed") statusBadgeClass = "bg-primary";
+
+        carouselHTML += `
+            <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                <div class="card shadow-lg p-3">
+                    <div class="card-body text-center">
+                        <h5 class="card-title"  style = "color: #003d82">${announcement.title}</h5>
+                        <p class="card-text">${announcement.description}</p>
+                        <p class="text-muted">Posted on: ${announcement.date}</p>
+                        <span class="badge ${statusBadgeClass}" style = "padding: 10px;">${announcement.status}</span>
+                    </div>
                 </div>
             </div>
-        </nav>
+        `;
+    });
 
-        <main>
-            <!-- Home Section -->
-            <section id="top" class="section-padding">
-                <div class="container">
+    carouselHTML += `
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#announcementCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true" ></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#announcementCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+        </div>
+    `;
+
+    announcementsContainer.innerHTML = carouselHTML;
+}
+
+    document.addEventListener("DOMContentLoaded", () => {
+    loadProducts();
+    loadAnnouncements();
+
+    // Attach event listener for "Buy Now" buttons
+    document.querySelectorAll(".buy-now-btn").forEach(button => {
+        button.addEventListener("click", (event) => {
+            const productId = event.target.getAttribute("data-product-id");
+            const productName = event.target.getAttribute("data-product-name");
+            const productPrice = event.target.getAttribute("data-product-price");
+            openBuyOrderModal(productId, productName, productPrice);
+        });
+    });
+
+    // Ensure total cost updates when quantity changes
+    const orderQuantityInput = document.getElementById("orderQuantity");
+    const modalProductPrice = document.getElementById("modal-product-price");
+    const totalCostInput = document.getElementById("totalCost");
+
+    if (!orderQuantityInput || !modalProductPrice || !totalCostInput) {
+        console.error("One or more modal elements not found. Make sure the modal exists in the DOM.");
+        return;
+    }
+
+    const shippingFee = 50;
+
+
+
+    orderQuantityInput.addEventListener("input", updateTotalCost);
+
+    document.getElementById("buyOrderModal").addEventListener("shown.bs.modal", updateTotalCost);
+});
+
+</script>
+
+
+</head>
+
+<body id="section_1">
+    <nav class="navbar navbar-expand-lg bg-light shadow-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="images/logo.png" class="logo img-fluid" alt="Los Booleanos">
+                <span>Los Booleanos <small>An Innovative Product</small></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#top">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#announcements">Announcements</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#appointments">Appointments</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#products">Products</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Home Section -->
+        <section id="top" class="section-padding text-center">
+            <div class="container">
+                <h2>Welcome to Los Booleanos</h2>
+                <p class="lead mt-3 discover-box">Enhance your learning experience with expert-led seminars, private tutoring, and interactive workshops. Book appointments for personalized guidance or stay informed with our latest announcements on upcoming events and learning opportunities.</p>
+            </div>
+        </section>
+
+        <!-- Announcements Section -->
+        <section id="announcements" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="section-title">Latest Announcements</h2>
+                <div id="announcements-container" style="color: #003d82;"></div>
+            </div>
+        </section>
+
+        <!-- Appointments Section -->
+        <section id="appointments" class="py-5">
+            <div class="container text-center">
+                <h2>Consultations & Speaking Engagements</h2>
+                <p class="lead">We are open for consultations and available as speakers for seminars.</p>
+                <a href="contact.html" class="btn custom-btn mt-3">Book an Appointment</a>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="section-title">Our Products</h2>
+                <div class="row" id="products-container"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="row">
+                <!-- About Us Section -->
+                <div class="col-lg-6 col-md-12 mb-4">
+                    <h5 class="site-footer-title mb-3">About Us</h5>
+                    <p class="text-white">
+                        Los Booleanos is founded by a team of passionate engineers dedicated to 
+                        advancing technology and education. Through our seminars, private tutoring, products, and innovative learning experiences, 
+                        we aim to inspire and empower individuals to excel in their fields.
+                    </p>
                     <div class="row">
-                        <div class="col-lg-12 col-12 text-center">
-                            <h2>Welcome to Los Booleanos</h2>
-                            <p class="lead mt-3 discover-box">
-                                Discover how logic gates work through connecting to Los Booleanos’ device WiFi. Explore the fundamentals of digital circuits with this innovative tool.
-                            </p>
-                            
-                            
-                            <a href="buynow.html" class="custom-btn btn mt-4">Learn More</a>
+                        <div class="col-4 text-center">
+                            <img src="images/bryan.jpg" alt="Engr. Bryan Dellera" class="img-fluid rounded-circle mb-2" style="max-width: 100px;">
+                            <p class="text-white">Engr. Bryan Dellera</p>
+                        </div>
+                        <div class="col-4 text-center">
+                            <img src="images/meshary.jpg" alt="Engr. Meshary Aquino" class="img-fluid rounded-circle mb-2" style="max-width: 100px;">
+                            <p class="text-white">Engr. Meshary Aquino</p>
+                        </div>
+                        <div class="col-4 text-center">
+                            <img src="images/dinrobert.jpg" alt="Engr. Dinrobert Cañon" class="img-fluid rounded-circle mb-2" style="max-width: 100px;">
+                            <p class="text-white">Engr. Dinrobert Cañon</p>
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <section id="services" class="py-5 bg-light">
-                <div class="container text-center">
-                    <h2 class="mb-4">Consultations & Speaking Engagements</h2>
-                    <p class="lead">We are open for consultations and available as speakers for seminars. Our rates are negotiable depending on your needs.</p>
-                    <p>Get in touch with us to discuss how we can collaborate!</p>
-                    <a href="contact.html" class="btn custom-btn mt-3">Contact Us</a>
+    
+                <!-- Contact Information -->
+                <div class="col-lg-4 col-md-6 col-12 mx-auto">
+                    <h5 class="site-footer-title mb-3">Contact Information</h5>
+                    <p class="text-white d-flex mb-2">
+                        <a href="tel:09924655513" class="site-footer-link">0992-465-5513</a>
+                    </p>
+                    <p class="text-white d-flex">
+                        <a href="mailto:info@yourgmail.com" class="site-footer-link">BDM@los.com</a>
+                    </p>
+                    <p class="text-white d-flex mt-3">Zamboanga City</p>
+                    <a href="#" class="custom-btn btn mt-3">Get Direction</a>
                 </div>
-            </section>
-
-            <!-- About Section -->
-            <section id="section_2" class="section-padding section-bg">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-6 col-12">
-                            <h2>About Us</h2>
-                            <p class="mt-3">
-                                BDM is a startup company planning to create new devices to let people interact with technologies and learn new concepts. Our vision is to make technology accessible and educational for everyone.
-                            </p>
-                            <p>
-                                Based in Zamboanga City, we are committed to innovation, pushing the boundaries of what’s possible and inspiring the next generation of learners and creators.
-                            </p>
-                        </div>
-                        <div class="col-lg-6 col-12 mt-4 mt-lg-0">
-                            <img src="images/website.jpg" class="img-fluid" alt="About Los Booleanos">
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="site-footer">
+            </div>
+        </div>
+    
+        <div class="site-footer-bottom">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-3 col-12 mb-4">
-                        <!-- Removed the logo image here -->
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-12 mx-auto">
-                        <h5 class="site-footer-title mb-3">Contact Information</h5>
-                        <p class="text-white d-flex mb-2">
-                            <a href="tel: 0992-465-5513" class="site-footer-link">
-                                0992-465-5513
-                            </a>
-                        </p>
-                        <p class="text-white d-flex">
-                            <a href="mailto:info@yourgmail.com" class="site-footer-link">
-                                BDM@los.com
-                            </a>
-                        </p>
-                        <p class="text-white d-flex mt-3">
-                            Zamboanga City
-                        </p>
-                        <a href="#" class="custom-btn btn mt-3">Get Direction</a>
+                    <div class="col-lg-6 col-md-5 col-12 mx-auto text-center">
+                        <p class="text-white mb-0">Los Booleanos</p>
                     </div>
                 </div>
             </div>
-            <div class="site-footer-bottom">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-6 col-md-5 col-12 mx-auto" style="text-align: center;">
-                            <p class="text-white mb-0">Los Booleanos</p>
-                        </div>
+        </div>
+    </footer>
+    
+
+    <!-- JAVASCRIPT FILES -->
+    <script src="js/bootstrap.min.js"></script>
+
+    
+    <div class="modal fade" id="buyOrderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Place Buy Order</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="modal-product-id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Product</label>
+                        <input type="text" class="form-control" id="modal-product-name" readonly>
                     </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Price (per unit)</label>
+                        <input type="text" class="form-control" id="modal-product-price" readonly>
+                    </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="orderQuantity" min="1" value="1">
+                    </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" class="form-control" id="customerName" placeholder="Enter your name">
+                    </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Customer Address</label>
+                        <input type="text" class="form-control" id="customerAddress" placeholder="Enter your address">
+                    </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Customer Email</label>
+                        <input type="email" class="form-control" id="customerEmail" placeholder="Enter your email">
+                    </div>
+    
+                    <div class="mb-3">
+                        <label class="form-label">Total Cost (including ₱50 shipping fee)</label>
+                        <input type="text" class="form-control" id="totalCost" readonly>
+                    </div>
+    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="submitOrder" class="btn btn-primary">Confirm Order</button>
                 </div>
             </div>
-        </footer>
+        </div>
+    </div>
+    
+    <script>
+        const shippingFee = 50; // Set shipping fee to ₱50
+    
+        function updateTotalCost() {
+            const priceText = document.getElementById("modal-product-price").value.trim();
+            const quantityText = document.getElementById("orderQuantity").value.trim();
+            
+            // Extract numeric price
+            const price = parseFloat(priceText.replace(/[^\d.]/g, '')) || 0;
+            const quantity = parseInt(quantityText) || 0;
+            const shippingFee = 50;
+            const totalCostInput = document.getElementById("totalCost");
+            console.log(price * quantity + shippingFee);
 
-        <!-- JAVASCRIPT FILES -->
-        <script src="js/jquery.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
-        <script src="js/jquery.sticky.js"></script>
-        <script src="js/click-scroll.js"></script>
-        <script src="js/counter.js"></script>
-        <script src="js/custom.js"></script>
-    </body>
+            // Ensure valid quantity
+            if (isNaN(quantity) || quantity < 1) {
+                totalCostInput.value = "Invalid quantity";
+                return;
+            }
 
-    </html>
+            // Calculate total cost
+            const total = (price * quantity) + shippingFee;
+            totalCostInput.value = `₱${total.toFixed(2)}`;
+
+        }
+    
+        // Update total cost when quantity changes
+        document.getElementById("orderQuantity").addEventListener("input", updateTotalCost);
+    
+        // Ensure total cost updates when modal is opened
+        document.getElementById("buyOrderModal").addEventListener("shown.bs.modal", updateTotalCost);
+    
+        // Submit order function
+        document.getElementById("submitOrder").addEventListener("click", async function () {
+            const productId = document.getElementById("modal-product-id").value;
+            const productName = document.getElementById("modal-product-name").value;
+            const productPrice = parseFloat(document.getElementById("modal-product-price").value);
+            const quantity = parseInt(document.getElementById("orderQuantity").value);
+            const totalCost = (productPrice * quantity) + 50;
+    
+            const customerName = document.getElementById("customerName").value;
+            const customerAddress = document.getElementById("customerAddress").value;
+            const customerEmail = document.getElementById("customerEmail").value;
+    
+            if (!customerName || !customerAddress || !customerEmail || isNaN(quantity) || quantity < 1) {
+                alert("Please fill in all details correctly.");
+                return;
+            }
+    
+            const newOrder = {
+                customerName,
+                customerAddress,
+                customerEmail,
+                productId,
+                productName,
+                quantity,
+                totalCost,
+                status: "Pending"
+            };
+    
+            await addDoc(collection(db, "buyOrders"), newOrder);
+            alert("Order placed successfully!");
+    
+            // Close modal after order
+            bootstrap.Modal.getInstance(document.getElementById("buyOrderModal")).hide();
+        });
+    </script>
+    
+</body>
+
+</html>

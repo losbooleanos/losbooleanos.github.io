@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-icons.css" rel="stylesheet">
+    <link href="css/templatemo-kind-heart-charity.css" rel="stylesheet">
+    
+    <style>
+        .navbar.bg-dark {
+            background-color: #003d82 !important;
+        }
+        .navbar .nav-link, .navbar-brand {
+            color: white !important;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .table {
+            background-color: white;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table th {
+            background-color: #003d82;
+            color: white;
+            text-align: center;
+        }
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .status-dropdown {
+            width: 100%;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .filter-container {
+            margin-bottom: 15px;
+        }
+        @media (max-width: 768px) {
+            .table {
+                font-size: 14px;
+            }
+            .status-dropdown {
+                font-size: 14px;
+            }
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .status-pending { background-color: yellow; color: black; }
+        .status-accepted { background-color: green; color: white; }
+        .status-rejected { background-color: red; color: white; }
+        .status-completed { background-color: blue; color: white; }
+        
+        .card { margin-bottom: 15px; }
+        .btn-sm { margin-right: 5px; }
+        .status-badge { padding: 5px 10px; border-radius: 5px; font-weight: bold; display: inline-block; }
+        .status-ongoing { background-color: green; color: white; }
+        .status-cancelled { background-color: red; color: white; }
+        .custom-button {
+        display: inline-block;
+        padding: 12px 24px;
+        font-size: 18px;
+        font-weight: bold;
+        margin-right: 30px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        color:  #003d82;
+        background-color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .custom-button:hover {
+        background-color: #303030;
+        color:white;
+        transform: translateY(-2px);
+        box-shadow: 0px 6px 12px rgba(0, 24, 205, 0.3);
+    }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3QJbDL7cmyJf8sJjephTn8C7w5yXJqBc",
+            authDomain: "los-booleanos.firebaseapp.com",
+            projectId: "los-booleanos",
+            storageBucket: "los-booleanos.firebasestorage.app",
+            messagingSenderId: "389775660083",
+            appId: "1:389775660083:web:4d283686b8ddfa9f843f46",
+            measurementId: "G-P8NKQS9LX4"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let appointmentsData = [];
+
+        function getStatusBadge(status) {
+            let statusClass = "";
+            if (status === "Pending") statusClass = "status-pending";
+            else if (status === "Accepted") statusClass = "status-accepted";
+            else if (status === "Rejected") statusClass = "status-rejected";
+            else if (status === "Completed") statusClass = "status-completed";
+
+            return `<span class="status-badge ${statusClass}">${status}</span>`;
+        }
+
+        async function fetchAppointments() {
+            const tableBody = document.getElementById("appointmentsTableBody");
+            tableBody.innerHTML = "";
+            document.getElementById("loading").style.display = "block";
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "appointments"));
+                appointmentsData = [];
+
+                querySnapshot.forEach((doc) => {
+                    let data = doc.data();
+                    data.id = doc.id;
+                    data.status = data.status || "Pending";
+                    appointmentsData.push(data);
+                });
+
+                renderTable("All Appointments");
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+                tableBody.innerHTML = "<tr><td colspan='8' class='text-center text-danger'>Error loading data.</td></tr>";
+            }
+            document.getElementById("loading").style.display = "none";
+        }
+
+        async function fetchAnnouncements() {
+    const announcementsList = document.getElementById("announcementsList");
+    announcementsList.innerHTML = "<li class='list-group-item text-muted'>Loading...</li>";
+
+    try {
+        const querySnapshot = await getDocs(collection(db, "announcements"));
+        announcementsList.innerHTML = "";
+        let announcements = [];
+
+        querySnapshot.forEach((doc) => {
+            let data = doc.data();
+            data.id = doc.id;
+            announcements.push(data);
+        });
+
+        if (announcements.length === 0) {
+            announcementsList.innerHTML = "<li class='list-group-item text-muted'>No announcements yet.</li>";
+            return;
+        }
+
+        // Sort announcements: "Ongoing" first, then "Cancelled"
+        announcements.sort((a, b) => {
+            if (a.status === "Ongoing" && b.status !== "Ongoing") return -1;
+            if (a.status !== "Ongoing" && b.status === "Ongoing") return 1;
+            return 0;
+        });
+
+        // Render announcements
+        announcements.forEach((data) => {
+            let statusClass = data.status === "Cancelled" ? "status-cancelled" : "status-ongoing";
+
+            const listItem = `
+                <li class="list-group-item">
+                    <h6>${data.title} <span class="status-badge ${statusClass}">${data.status}</span></h6>
+                    <p>${data.description}</p>
+                    <p><strong>Date:</strong> ${data.date} | <strong>Time:</strong> ${data.time}</p>
+                    <p><strong>Certificate:</strong> ${data.certificateType}</p>
+                    <p><strong>Speaker:</strong> ${data.speaker}</p>
+                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" 
+                        data-title="${data.title}" data-description="${data.description}" 
+                        data-date="${data.date}" data-time="${data.time}" 
+                        data-certificate="${data.certificateType}" 
+                        data-speaker="${data.speaker}" 
+                        data-bs-toggle="modal" data-bs-target="#editAnnouncementModal">Edit</button>
+                    <button class="btn btn-danger btn-sm cancel-btn" data-id="${data.id}">Cancel</button>
+                </li>
+            `;
+            announcementsList.innerHTML += listItem;
+        });
+
+        // Attach event listeners to buttons
+        document.querySelectorAll(".edit-btn").forEach(button => {
+            button.addEventListener("click", populateEditModal);
+        });
+
+        document.querySelectorAll(".cancel-btn").forEach(button => {
+            button.addEventListener("click", cancelAnnouncement);
+        });
+
+    } catch (error) {
+        console.error("Error fetching announcements: ", error);
+        announcementsList.innerHTML = "<li class='list-group-item text-danger'>Failed to load announcements.</li>";
+    }
+}
+
+
+function populateEditModal(event) {
+    const btn = event.target;
+    document.getElementById("editAnnouncementId").value = btn.getAttribute("data-id");
+    document.getElementById("editAnnouncementTitle").value = btn.getAttribute("data-title");
+    document.getElementById("editAnnouncementDescription").value = btn.getAttribute("data-description");
+    document.getElementById("editAnnouncementDate").value = btn.getAttribute("data-date");
+    document.getElementById("editAnnouncementTime").value = btn.getAttribute("data-time");
+    document.getElementById("editCertificateType").value = btn.getAttribute("data-certificate");
+    document.getElementById("editAnnouncementSpeaker").value = btn.getAttribute("data-speaker");
+}
+
+document.getElementById("editAnnouncementForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const id = document.getElementById("editAnnouncementId").value;
+    const title = document.getElementById("editAnnouncementTitle").value;
+    const description = document.getElementById("editAnnouncementDescription").value;
+    const date = document.getElementById("editAnnouncementDate").value;
+    const time = document.getElementById("editAnnouncementTime").value;
+    const certificateType = document.getElementById("editCertificateType").value;
+    const speaker = document.getElementById("editAnnouncementSpeaker").value;
+
+    try {
+        await updateDoc(doc(db, "announcements", id), {
+            title, description, date, time, certificateType, speaker
+        });
+
+        alert("Announcement updated successfully!");
+        fetchAnnouncements(); // Refresh the announcements list
+        document.querySelector("#editAnnouncementModal .btn-close").click(); // Close modal
+    } catch (error) {
+        console.error("Error updating announcement: ", error);
+        alert("Failed to update announcement.");
+    }
+});
+
+
+        // Function to edit an announcement
+        async function editAnnouncement(event) {
+            const btn = event.target;
+            const id = btn.getAttribute("data-id");
+            const title = prompt("Edit Title:", btn.getAttribute("data-title"));
+            const description = prompt("Edit Description:", btn.getAttribute("data-description"));
+            const date = prompt("Edit Date (YYYY-MM-DD):", btn.getAttribute("data-date"));
+            const time = prompt("Edit Time (HH:MM):", btn.getAttribute("data-time"));
+            const certificateType = prompt("Edit Certificate Type (Free Certificate / Paid Certificate):", btn.getAttribute("data-certificate"));
+            const speaker = prompt("Edit Speaker:", btn.getAttribute("data-speaker"));
+
+            if (title && description && date && time && certificateType && speaker) {
+                try {
+                    await updateDoc(doc(db, "announcements", id), {
+                        title, description, date, time, certificateType, speaker
+                    });
+                    alert("Announcement updated successfully!");
+                    fetchAnnouncements();
+                } catch (error) {
+                    console.error("Error updating announcement: ", error);
+                    alert("Failed to update announcement.");
+                }
+            }
+        }
+
+        // Function to cancel an announcement
+        async function cancelAnnouncement(event) {
+            const id = event.target.getAttribute("data-id");
+
+            if (confirm("Are you sure you want to cancel this announcement?")) {
+                try {
+                    await updateDoc(doc(db, "announcements", id), { status: "Cancelled" });
+                    alert("Announcement cancelled.");
+                    fetchAnnouncements();
+                } catch (error) {
+                    console.error("Error cancelling announcement: ", error);
+                    alert("Failed to cancel announcement.");
+                }
+            }
+        }
+
+// Call function on page load
+document.addEventListener("DOMContentLoaded", () => {
+    fetchAppointments();
+    fetchAnnouncements(); 
+    document.getElementById("announcementForm").addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                const title = document.getElementById("announcementTitle").value;
+                const description = document.getElementById("announcementDescription").value;
+                const date = document.getElementById("announcementDate").value;
+                const time = document.getElementById("announcementTime").value;
+                const certificateType = document.getElementById("certificateType").value;
+                const speaker = document.getElementById("announcementSpeaker").value;
+
+                try {
+                    await addDoc(collection(db, "announcements"), {
+                        title, description, date, time, certificateType, speaker,
+                        status: "Ongoing", // Default status
+                        timestamp: new Date().toISOString()
+                    });
+
+                    alert("Announcement posted successfully!");
+                    document.getElementById("announcementForm").reset();
+                    fetchAnnouncements();
+                } catch (error) {
+                    console.error("Error adding announcement:", error);
+                    alert("Failed to post announcement.");
+                }
+            });
+});
+
+
+        function renderTable(filterStatus) {
+            const tableBody = document.getElementById("appointmentsTableBody");
+            tableBody.innerHTML = "";
+
+            let filteredAppointments = appointmentsData.filter(app =>
+                filterStatus === "All Appointments" || app.status === filterStatus
+            );
+
+            if (filteredAppointments.length === 0) {
+                tableBody.innerHTML = "<tr><td colspan='8' class='text-center text-muted'>No appointments found.</td></tr>";
+                return;
+            }
+
+            filteredAppointments.forEach((data) => {
+                const row = `
+                    <tr>
+                        <td>${data.name}</td>
+                        <td>${data.email}</td>
+                        <td>${data.engagementType}</td>
+                        <td>${data.date}</td>
+                        <td>${data.time}</td>
+                        <td>${data.members}</td>
+                        <td>${data.message}</td>
+                        <td>
+                            ${getStatusBadge(data.status)}
+                            <select class="form-select status-dropdown" data-id="${data.id}">
+                                <option value="Pending" ${data.status === "Pending" ? "selected" : ""}>Pending</option>
+                                <option value="Accepted" ${data.status === "Accepted" ? "selected" : ""}>Accepted</option>
+                                <option value="Rejected" ${data.status === "Rejected" ? "selected" : ""}>Rejected</option>
+                                <option value="Completed" ${data.status === "Completed" ? "selected" : ""}>Completed</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+            document.querySelectorAll(".status-dropdown").forEach(select => {
+                select.addEventListener("change", async function () {
+                    const appointmentId = this.getAttribute("data-id");
+                    const newStatus = this.value;
+
+                    try {
+                        await updateDoc(doc(db, "appointments", appointmentId), { status: newStatus });
+                        alert("Status updated successfully!");
+                        fetchAppointments();
+                    } catch (error) {
+                        console.error("Error updating status: ", error);
+                        alert("Failed to update status. Try again.");
+                    }
+                });
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchAppointments();
+            document.getElementById("statusFilter").addEventListener("change", function () {
+                renderTable(this.value);
+            });
+
+            document.getElementById("announcementForm").addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                const title = document.getElementById("announcementTitle").value;
+                const description = document.getElementById("announcementDescription").value;
+                const date = document.getElementById("announcementDate").value;
+                const time = document.getElementById("announcementTime").value;
+                const certificateType = document.getElementById("certificateType").value;
+                const speaker = document.getElementById("announcementSpeaker").value;
+
+                try {
+                    await addDoc(collection(db, "announcements"), {
+                        title,
+                        description,
+                        date,
+                        time,
+                        certificateType,
+                        speaker,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    alert("Announcement posted successfully!");
+                    document.getElementById("announcementForm").reset();
+                    fetchAnnouncements(); // Refresh the list
+                } catch (error) {
+                    console.error("Error adding announcement:", error);
+                    alert("Failed to post announcement.");
+                }
+            });
+
+
+        });
+    </script>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg bg-dark shadow-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Admin Panel</a>
+        </div>
+        <a href="buy_orders_products.html" class="custom-button">Go to Buy Orders and Products</a>
+    </nav>
+
+    <div class="container">
+        <h2 class="text-center mb-4">Appointments List</h2>
+
+        <!-- Filter Dropdown -->
+        <div class="filter-container text-center">
+            <label for="statusFilter" class="me-2"><strong>Filter by Status:</strong></label>
+            <select id="statusFilter" class="form-select d-inline-block w-auto">
+                <option value="All Appointments">All Appointments</option>
+                <option value="Pending">Pending</option>
+                <option value="Accepted">Accepted</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Completed">Completed</option>
+            </select>
+        </div>
+
+        <p class="text-center" id="loading">Loading data, please wait...</p>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Engagement Type</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Members</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="appointmentsTableBody">
+                    <!-- Data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        <h2 class="text-center">Announcements</h2>
+    
+<!-- Announcement Form -->
+<div class="card p-3 mb-4">
+    <h5>Create an Announcement</h5>
+    <form id="announcementForm">
+        <input type="text" id="announcementTitle" class="form-control mb-2" placeholder="Title" required>
+        <textarea id="announcementDescription" class="form-control mb-2" rows="3" placeholder="Description" required></textarea>
+        <input type="date" id="announcementDate" class="form-control mb-2" required>
+        <input type="time" id="announcementTime" class="form-control mb-2" required>
+        <select id="certificateType" class="form-control mb-2" required>
+            <option value="" disabled selected>Select Certificate Type</option>
+            <option value="Free Certificate">Free Certificate</option>
+            <option value="Paid Certificate">Paid Certificate</option>
+        </select>
+        <select id="announcementSpeaker" class="form-control mb-2" required>
+            <option value="" disabled selected>Select Speaker</option>
+            <option value="Engr. Bryan P. Dellera">Engr. Bryan P. Dellera</option>
+            <option value="Engr. Meshary A. Aquino">Engr. Meshary A. Aquino</option>
+            <option value="Engr. Dinrobert C. Cañon">Engr. Dinrobert C. Cañon</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Post Announcement</button>
+    </form>
+</div>
+
+<!-- Edit Announcement Modal -->
+<div class="modal fade" id="editAnnouncementModal" tabindex="-1" aria-labelledby="editAnnouncementModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAnnouncementModalLabel">Edit Announcement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAnnouncementForm">
+                    <input type="hidden" id="editAnnouncementId">
+                    <input type="text" id="editAnnouncementTitle" class="form-control mb-2" placeholder="Title" required>
+                    <textarea id="editAnnouncementDescription" class="form-control mb-2" rows="3" placeholder="Description" required></textarea>
+                    <input type="date" id="editAnnouncementDate" class="form-control mb-2" required>
+                    <input type="time" id="editAnnouncementTime" class="form-control mb-2" required>
+                    <select id="editCertificateType" class="form-control mb-2" required>
+                        <option value="Free Certificate">Free Certificate</option>
+                        <option value="Paid Certificate">Paid Certificate</option>
+                    </select>
+                    <select id="editAnnouncementSpeaker" class="form-control mb-2" required>
+                        <option value="Engr. Bryan P. Dellera">Engr. Bryan P. Dellera</option>
+                        <option value="Engr. Meshary A. Aquino">Engr. Meshary A. Aquino</option>
+                        <option value="Engr. Dinrobert C. Cañon">Engr. Dinrobert C. Cañon</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    
+        <!-- Announcements List -->
+        <div class="card p-3">
+            <h5>Existing Announcements</h5>
+            <ul id="announcementsList" class="list-group">
+                <li class="list-group-item text-muted">No announcements yet.</li>
+            </ul>
+        </div>
+    </div>
+    
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+</html>

@@ -60,8 +60,90 @@
         .site-footer-bottom .text-white {
             color: #cce5ff !important;
         }
-        
+.custom-form .form-control {
+    border-radius: 6px;
+    border: 1px solid #0056b3;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.custom-form .form-label {
+    font-weight: bold;
+    color: #003d82;
+}
+
+.custom-btn {
+    background-color: #003d82 !important;
+    border: none;
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.custom-btn:hover {
+    background-color: #002a5c !important;
+}
+
+@media (max-width: 768px) {
+    .row .col-md-6 {
+        width: 100%;
+    }
+}
+
     </style>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3QJbDL7cmyJf8sJjephTn8C7w5yXJqBc",
+            authDomain: "los-booleanos.firebaseapp.com",
+            projectId: "los-booleanos",
+            storageBucket: "los-booleanos.firebasestorage.app",
+            messagingSenderId: "389775660083",
+            appId: "1:389775660083:web:4d283686b8ddfa9f843f46",
+            measurementId: "G-P8NKQS9LX4"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("contactForm").addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                const name = document.getElementById("name").value;
+                const email = document.getElementById("email").value;
+                const engagementType = document.getElementById("engagementType").value;
+                const date = document.getElementById("date").value;
+                const time = document.getElementById("time").value;
+                const members = document.getElementById("members").value;
+                const message = document.getElementById("message").value;
+
+                try {
+                    await addDoc(collection(db, "appointments"), {
+                        name,
+                        email,
+                        engagementType,
+                        date,
+                        time,
+                        members,
+                        message,
+                        timestamp: new Date()
+                    });
+                    alert("Appointment request sent successfully!");
+                    document.getElementById("contactForm").reset();
+                } catch (error) {
+                    console.error("Error adding document: ", error);
+                    alert("Error sending request. Try again.");
+                }
+            });
+        });
+
+    </script>
 </head>
 
 <body>
@@ -101,12 +183,51 @@
                     <div class="col-lg-6 col-12 mx-auto">
                         <h2 class="mb-4 text-center">Get in Touch</h2>
                         <p class="text-center">We are open for consultations and available as speakers for seminars. Contact us for inquiries!</p>
-                        <form class="custom-form contact-form" action="https://formspree.io/f/mrbpbard" method="POST">
-                            <input type="text" name="name" class="form-control" placeholder="Your Name" required>
-                            <input type="email" name="email" class="form-control" placeholder="Your Email" required>
-                            <textarea name="message" class="form-control" rows="5" placeholder="Your Message" required></textarea>
-                            <button type="submit" class="form-control custom-btn">Send Message</button>
+                        <form id="contactForm" class="custom-form contact-form">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Your Name</label>
+                                <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                            </div>
+                        
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Your Email</label>
+                                <input type="email" id="email" class="form-control" placeholder="Enter your email address" required>
+                            </div>
+                        
+                            <div class="mb-3">
+                                <label for="engagementType" class="form-label">Engagement Type</label>
+                                <select id="engagementType" class="form-control" required>
+                                    <option value="" disabled selected>Choose an option</option>
+                                    <option value="Consultation">Consultation</option>
+                                    <option value="Tutorial Arrangement">Tutorial Arrangement</option>
+                                </select>
+                            </div>
+                        
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="date" class="form-label">Preferred Date</label>
+                                    <input type="date" id="date" class="form-control" required>
+                                </div>
+                        
+                                <div class="col-md-6 mb-3">
+                                    <label for="time" class="form-label">Preferred Time</label>
+                                    <input type="time" id="time" class="form-control" required>
+                                </div>
+                            </div>
+                        
+                            <div class="mb-3">
+                                <label for="members" class="form-label">Number of Members</label>
+                                <input type="number" id="members" class="form-control" placeholder="Enter number of participants" min="1" required>
+                            </div>
+                        
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Additional Message</label>
+                                <textarea id="message" class="form-control" rows="5" placeholder="Enter any details or questions" required></textarea>
+                            </div>
+                        
+                            <button type="submit" class="form-control custom-btn">Send Request</button>
                         </form>
+                        
                         <div class="mt-4 text-center">
                             <h5>Contact Information</h5>
                             <p><strong>Phone:</strong> <a href="tel:0992-465-5513">0992-465-5513</a></p>
@@ -125,11 +246,9 @@
         </div>
     </footer>
 
-
     <!-- JAVASCRIPT FILES -->
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
 
 </body>
-
 </html>

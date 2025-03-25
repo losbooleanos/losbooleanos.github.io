@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Orders and Products</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3QJbDL7cmyJf8sJjephTn8C7w5yXJqBc",
+            authDomain: "los-booleanos.firebaseapp.com",
+            projectId: "los-booleanos",
+            storageBucket: "los-booleanos.appspot.com",  // FIXED storage bucket
+            messagingSenderId: "389775660083",
+            appId: "1:389775660083:web:4d283686b8ddfa9f843f46",
+            measurementId: "G-P8NKQS9LX4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app, "gs://los-booleanos.firebasestorage.app");
+
+            async function loadBuyOrders() {
+                const buyOrdersTable = document.getElementById("buyOrdersTable");
+                if (!buyOrdersTable) return;
+                buyOrdersTable.innerHTML = "";
+                const querySnapshot = await getDocs(collection(db, "buyOrders"));
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const row = `<tr>
+                        <td>${doc.id}</td>
+                        <td>${data.customerName}</td>
+                        <td>${data.customerAddress}</td>
+                        <td>${data.customerEmail}</td>
+                        <td>${data.product}</td>
+                        <td>${data.quantity}</td>
+                        <td>₱${data.shippingFee ? data.shippingFee.toFixed(2) : "50.00"}</td>
+                        <td>₱${data.totalCost ? data.totalCost.toFixed(2) : "0.00"}</td>
+                        <td>
+                            <select onchange="updateOrderStatus('${doc.id}', this.value)" class="form-select">
+                                <option value="Pending" ${data.status === "Pending" ? "selected" : ""}>Pending</option>
+                                <option value="Shipped" ${data.status === "Shipped" ? "selected" : ""}>Shipped</option>
+                                <option value="Accepted" ${data.status === "Accepted" ? "selected" : ""}>Accepted</option>
+                                <option value="Rejected" ${data.status === "Rejected" ? "selected" : ""}>Rejected</option>
+                                <option value="Delivered" ${data.status === "Delivered" ? "selected" : ""}>Delivered</option>
+                            </select>
+                        </td>
+                    </tr>`;
+                    buyOrdersTable.innerHTML += row;
+                });
+            }
+
+
+
+
+            async function loadProducts() {
+                const productsTable = document.getElementById("productsTable");
+                
+                if (!productsTable) return;
+                productsTable.innerHTML = "";
+                
+                const querySnapshot = await getDocs(collection(db, "products"));
+                
+                for (const doc of querySnapshot.docs) {
+                    const data = doc.data();
+                    const price = data.price ? parseFloat(data.price) : 0; // ✅ Fix for undefined price
+                    const stock = data.stock ?? 0; // ✅ Default stock to 0 if missing
+                    const name = data.name ?? "Unknown Product"; // ✅ Handle missing name
+                    let imageUrl = 'https://firebasestorage.googleapis.com/v0/b/los-booleanos.firebasestorage.app/o/default%2FNo_image_available.png?alt=media&token=70c26d2b-e95f-4b28-9455-3d8c4d0ba760';
+                    
+                    if (data.imageUrl) {
+                        try {
+                            imageUrl = await getDownloadURL(ref(storage, data.imageUrl));
+                        } catch (error) {
+                            console.error("Error loading image:", error);
+                        }
+                    }
+
+                    const row = `<tr>
+                        <td><img src="${imageUrl}" alt="Product Image" width="50"></td>
+                        <td>${doc.id}</td>
+                        <td>${data.name}</td>
+                        <td>₱${data.price.toFixed(2)}</td>
+                        <td>${data.stock}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="openEditModal('${doc.id}', '${data.name}', ${data.price}, ${data.stock}, '${data.imageUrl || ''}')">Edit</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct('${doc.id}')">Delete</button>
+                        </td>
+                    </tr>`;
+                    productsTable.innerHTML += row;
+                }
+            }
+
+
+
+        async function deleteProduct(productId) {
+            if (confirm("Are you sure you want to delete this product?")) {
+                await deleteDoc(doc(db, "products", productId));
+                loadProducts();
+            }
+        }
+
+        async function updateOrderStatus(orderId, status) {
+            await updateDoc(doc(db, "buyOrders", orderId), { status });
+            loadBuyOrders();
+        }
+
+        // Open Add Product Modal
+        function openAddModal() {
+            document.getElementById("productForm").reset();
+            document.getElementById("productId").value = "";
+            document.getElementById("modalTitle").innerText = "Add Product";
+            document.getElementById("saveProductBtn").onclick = addProduct;
+            new bootstrap.Modal(document.getElementById("productModal")).show();
+        }
+
+        // Open Edit Product Modal
+        function openEditModal(id, name, price, stock) {
+            document.getElementById("productId").value = id;
+            document.getElementById("productName").value = name;
+            document.getElementById("productPrice").value = price;
+            document.getElementById("productStock").value = stock;
+            document.getElementById("modalTitle").innerText = "Edit Product";
+            document.getElementById("saveProductBtn").onclick = editProduct;
+            new bootstrap.Modal(document.getElementById("productModal")).show();
+        }
+
+            async function addProduct() {
+                const name = document.getElementById("productName").value;
+                const price = parseFloat(document.getElementById("productPrice").value);
+                const stock = parseInt(document.getElementById("productStock").value);
+                const imageFile = document.getElementById("productImage").files[0];
+
+                if (name && !isNaN(price) && !isNaN(stock)) {
+                    let imageUrl = "default/No_image_available.png"; // Default image path in Firebase Storage
+
+                    if (imageFile) {
+                        // Upload new image if provided
+                        const storageRef = ref(storage, `product_images/${imageFile.name}`);
+                        const uploadTask = await uploadBytes(storageRef, imageFile);
+                        imageUrl = await getDownloadURL(uploadTask.ref);
+                    }
+
+                    await addDoc(collection(db, "products"), { name, price, stock, imageUrl });
+                    loadProducts();
+                    bootstrap.Modal.getInstance(document.getElementById("productModal")).hide();
+                } else {
+                    alert("Please fill all fields correctly.");
+                }
+            }
+
+
+        async function editProduct() {
+            const id = document.getElementById("productId").value;
+            const name = document.getElementById("productName").value;
+            const price = parseFloat(document.getElementById("productPrice").value);
+            const stock = parseInt(document.getElementById("productStock").value);
+            const imageFile = document.getElementById("productImage").files[0];
+
+            if (id && name && !isNaN(price) && !isNaN(stock)) {
+                let updatedData = { name, price, stock };
+
+                if (imageFile) {
+                    // Upload new image to Firebase Storage
+                    const storageRef = ref(storage, `product_images/${imageFile.name}`);
+                    const uploadTask = await uploadBytes(storageRef, imageFile);
+                    const imageUrl = await getDownloadURL(uploadTask.ref);
+                    updatedData.imageUrl = imageUrl; // Update image URL in Firestore
+                }
+
+                await updateDoc(doc(db, "products", id), updatedData);
+                loadProducts();
+                bootstrap.Modal.getInstance(document.getElementById("productModal")).hide();
+            } else {
+                alert("Please fill all fields correctly.");
+            }
+        }
+
+
+        window.openAddModal = openAddModal;
+        window.openEditModal = openEditModal;
+        window.deleteProduct = deleteProduct;
+        window.updateOrderStatus = updateOrderStatus;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadBuyOrders();
+            loadProducts();
+        });
+    </script>
+       <style>
+        .navbar.bg-dark {
+            background-color: #003d82 !important;
+        }
+        .navbar .nav-link, .navbar-brand {
+            color: white !important;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .table {
+            background-color: white;
+            width: 100%;
+            overflow-x: auto;
+        }
+        .table th {
+            background-color: #041f3f;
+            color: white;
+            text-align: center;
+        }
+        .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .custom-button {
+            display: inline-block;
+            margin-bottom: 30px;
+            margin-right: 30px;
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            color:#003d82;
+            background-color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .custom-button:hover {
+            background-color: #313131;
+            color:white;
+            transform: translateY(-2px);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white" href="#">Admin Panel</a>
+        </div>
+        <div class="text-center mt-4">
+            <a href="admin_los_booleanos.html" class="custom-button">Back to Admin</a>
+            
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>Buy Orders</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer Name</th>
+                    <th>Customer Address</th>
+                    <th>Customer Email</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Shipping Fee</th>
+                    <th>Total Cost</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="buyOrdersTable"></tbody>
+        </table>
+
+        <h2>Products</h2>
+        <button onclick="openAddModal()" class="custom-button" style="margin: 10px; background-color: #003d82; color: white;">Add Product</button>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Picture</th>
+                    <th>Product ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="productsTable"></tbody>
+        </table>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal fade" id="productModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 id="modalTitle">Add Product</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <input type="hidden" id="productId">
+                        <div class="mb-3">
+                            <label for="productImage" class="form-label">Product Image</label>
+                            <input type="file" accept="image/*" id="productImage" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Name</label>
+                            <input type="text" id="productName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productPrice" class="form-label">Price</label>
+                            <input type="number" id="productPrice" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productStock" class="form-label">Stock</label>
+                            <input type="number" id="productStock" class="form-control" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveProductBtn" class="btn btn-primary" style="background-color: #003d82;">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
