@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3QJbDL7cmyJf8sJjephTn8C7w5yXJqBc",
+            authDomain: "los-booleanos.firebaseapp.com",
+            projectId: "los-booleanos",
+            storageBucket: "los-booleanos.appspot.com",
+            messagingSenderId: "389775660083",
+            appId: "1:389775660083:web:4d283686b8ddfa9f843f46",
+            measurementId: "G-P8NKQS9LX4"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadStatistics() {
+            const querySnapshot = await getDocs(collection(db, "buyOrders"));
+            let shippedTotal = 0, acceptedTotal = 0, deliveredTotal = 0, grandTotal = 0;
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                if (["Shipped", "Accepted", "Delivered"].includes(data.status)) {
+                    const cost = data.totalCost || 0;
+                    grandTotal += cost;
+                    if (data.status === "Shipped") shippedTotal += cost;
+                    if (data.status === "Accepted") acceptedTotal += cost;
+                    if (data.status === "Delivered") deliveredTotal += cost;
+                }
+            });
+
+            document.getElementById("shippedSales").innerText = `₱${shippedTotal.toFixed(2)}`;
+            document.getElementById("acceptedSales").innerText = `₱${acceptedTotal.toFixed(2)}`;
+            document.getElementById("deliveredSales").innerText = `₱${deliveredTotal.toFixed(2)}`;
+            document.getElementById("totalSales").innerText = `₱${grandTotal.toFixed(2)}`;
+
+            const ctx = document.getElementById("salesChart").getContext("2d");
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: ["Shipped", "Accepted", "Delivered"],
+                    datasets: [{
+                        label: "Total Sales (₱)",
+                        data: [shippedTotal, acceptedTotal, deliveredTotal],
+                        backgroundColor: ["blue", "green", "orange"],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadStatistics);
+    </script>
+    <style>
+        .navbar.bg-dark { background-color: #003d82 !important; }
+        .navbar .nav-link, .navbar-brand { color: white !important; }
+        .container { margin-top: 30px; }
+        .stats-card { padding: 20px; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); }
+        .shipped { background-color: lightblue; }
+        .accepted { background-color: lightgreen; }
+        .delivered { background-color: orange; }
+        .total { background-color: gray; color: white; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white" href="#">Statistics</a>
+        </div>
+        <div class="text-center mt-4" style="margin-right: 30px; margin-bottom: 15px;">
+            <a href="buy_orders_products.html" class="btn btn-primary">Buy Orders</a>
+        </div>
+        <div class="text-center mt-4" style="margin-right: 30px; margin-bottom: 15px;">
+            <a href="admin_los_booleanos.html" class="btn btn-primary">Back to Admin</a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>Sales Statistics</h2>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stats-card shipped">
+                    <h4>Shipped Sales</h4>
+                    <p id="shippedSales">₱0.00</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card accepted">
+                    <h4>Accepted Sales</h4>
+                    <p id="acceptedSales">₱0.00</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card delivered">
+                    <h4>Delivered Sales</h4>
+                    <p id="deliveredSales">₱0.00</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card total">
+                    <h4>Total Sales</h4>
+                    <p id="totalSales">₱0.00</p>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="salesChart" class="mt-4"></canvas>
+        
+
+    </div>
+</body>
+</html>
