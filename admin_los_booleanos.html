@@ -346,7 +346,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         <td>${data.time}</td>
                         <td>${data.members}</td>
                         <td>${data.message}</td>
-                        <td>${data.revenue}</td>
+                        <td>
+                            <input type="number" class="form-control revenue-input" 
+                                data-id="${data.id}" value="${data.revenue || 0}" 
+                                style="width: 80px; text-align: center;">
+                        </td>
                         <td>
                             ${getStatusBadge(data.status)}
                             <select class="form-select status-dropdown" data-id="${data.id}">
@@ -373,6 +377,25 @@ document.addEventListener("DOMContentLoaded", () => {
                     } catch (error) {
                         console.error("Error updating status: ", error);
                         alert("Failed to update status. Try again.");
+                    }
+                });
+            });
+
+            document.querySelectorAll(".revenue-input").forEach(input => {
+                input.addEventListener("change", async function() {
+                    const appointmentId = this.getAttribute("data-id");
+                    const newRevenue = this.value;
+
+                    try {
+                        await updateDoc(doc(db, "appointments", appointmentId), { 
+                            revenue: Number(newRevenue) 
+                        });
+                        // Optional: Show a success message or update UI
+                    } catch (error) {
+                        console.error("Error updating revenue: ", error);
+                        alert("Failed to update revenue. Try again.");
+                        // Revert the input value if update fails
+                        this.value = appointmentsData.find(a => a.id === appointmentId).revenue || 0;
                     }
                 });
             });
