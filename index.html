@@ -103,7 +103,19 @@
 
         .status-upcoming { background-color: red; color: white; }
         .status-ongoing { background-color: green; color: white; }
-    
+        #seeVideoBtn {
+            background-color: #003d82;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #seeVideoBtn:hover {
+            background-color: #002a5a;
+        }
 
     </style>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -426,9 +438,41 @@ async function loadAnnouncements() {
                 <h2>Welcome to Los Booleanos</h2>
                 <p class="lead mt-3 discover-box">Enhance your learning experience with expert-led seminars, private tutoring, and interactive workshops. Book appointments for personalized guidance or stay informed with our latest announcements on upcoming events and learning opportunities.</p>
             </div>
+
         </section>
 
         <!-- Announcements Section -->
+         <!-- Add this right after the "Existing Announcements" card -->
+        <div class="card p-3 mt-4">
+            <h5>Los Booleanos Video</h5>
+            <button id="seeVideoBtn" class="btn btn-primary mb-3">See Video</button>
+            <div id="videoContainer" style="display: none;">
+                <div class="ratio ratio-16x9">
+                    <iframe id="videoFrame" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById('seeVideoBtn').addEventListener('click', function() {
+                const videoContainer = document.getElementById('videoContainer');
+                const videoFrame = document.getElementById('videoFrame');
+                
+                if (videoContainer.style.display === 'none') {
+                    // Replace this with your actual YouTube video ID
+                    const videoId = 'yRsrP706nGM';
+                    videoFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=0`;
+                    videoContainer.style.display = 'block';
+                    this.textContent = 'Hide Video';
+                } else {
+                    videoFrame.src = '';
+                    videoContainer.style.display = 'none';
+                    this.textContent = 'See Video';
+                }
+            });
+        </script>
+
+
         <section id="announcements" class="py-5 bg-light">
             <div class="container">
                 <h2 class="section-title">Latest Announcements</h2>
