@@ -390,6 +390,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         await updateDoc(doc(db, "appointments", appointmentId), { 
                             revenue: Number(newRevenue) 
                         });
+                        console.log("Revenue edited successfully!");
                         // Optional: Show a success message or update UI
                     } catch (error) {
                         console.error("Error updating revenue: ", error);

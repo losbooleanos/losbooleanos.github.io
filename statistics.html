@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistics</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -23,11 +24,15 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        let revenueChart;
+        let revenueData = {};
+
         async function loadStatistics() {
-            const querySnapshot = await getDocs(collection(db, "buyOrders"));
+            // Load sales statistics
+            const salesQuery = await getDocs(collection(db, "buyOrders"));
             let shippedTotal = 0, acceptedTotal = 0, deliveredTotal = 0, grandTotal = 0;
 
-            querySnapshot.forEach((doc) => {
+            salesQuery.forEach((doc) => {
                 const data = doc.data();
                 if (["Shipped", "Accepted", "Delivered"].includes(data.status)) {
                     const cost = data.totalCost || 0;
@@ -43,8 +48,8 @@
             document.getElementById("deliveredSales").innerText = `₱${deliveredTotal.toFixed(2) - 50.00}`;
             document.getElementById("totalSales").innerText = `₱${grandTotal.toFixed(2) - 50.00}`;
 
-            const ctx = document.getElementById("salesChart").getContext("2d");
-            new Chart(ctx, {
+            const salesCtx = document.getElementById("salesChart").getContext("2d");
+            new Chart(salesCtx, {
                 type: "bar",
                 data: {
                     labels: ["Shipped", "Accepted", "Delivered"],
@@ -61,6 +66,189 @@
                     }
                 }
             });
+
+            // Load revenue statistics
+            await loadRevenueStatistics();
+            
+            // Set up button event listeners after data is loaded
+            setupChartToggleButtons();
+        }
+
+        async function loadRevenueStatistics() {
+            const querySnapshot = await getDocs(collection(db, "appointments"));
+            revenueData = {
+                byMonth: {},
+                byType: {},
+                engagementTypes: new Set()
+            };
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const revenue = parseFloat(data.revenue) || 0;
+                const date = data.date ? new Date(data.date) : new Date();
+                const monthYear = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}`;
+                const engagementType = data.engagementType || "Other";
+
+                // Aggregate by month
+                revenueData.byMonth[monthYear] = (revenueData.byMonth[monthYear] || 0) + revenue;
+                
+                // Aggregate by engagement type (for stacked bar chart)
+                if (!revenueData.byType[monthYear]) {
+                    revenueData.byType[monthYear] = {};
+                }
+                revenueData.byType[monthYear][engagementType] = (revenueData.byType[monthYear][engagementType] || 0) + revenue;
+                revenueData.engagementTypes.add(engagementType);
+            });
+
+            // Sort months chronologically
+            revenueData.sortedMonths = Object.keys(revenueData.byMonth).sort();
+            
+            // Convert engagementTypes Set to Array
+            revenueData.engagementTypes = Array.from(revenueData.engagementTypes);
+            
+            // Initialize with line chart
+            renderRevenueChart('line');
+        }
+
+        function renderRevenueChart(type) {
+            const ctx = document.getElementById("revenueChart").getContext("2d");
+            
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+
+            if (type === 'line') {
+                // Line chart configuration for time series
+                const labels = revenueData.sortedMonths;
+                const data = labels.map(m => revenueData.byMonth[m]);
+                
+                revenueChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Monthly Revenue (₱)',
+                            data: data,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Revenue Trend Over Time'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `₱${context.raw.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return `₱${value}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } 
+            else {
+                // Stacked bar chart configuration by engagement type
+                const labels = revenueData.sortedMonths;
+                const engagementTypes = revenueData.engagementTypes;
+                
+                // Generate dataset for each engagement type
+                const datasets = engagementTypes.map(type => {
+                    const color = getRandomColor();
+                    
+                    return {
+                        label: type,
+                        data: labels.map(month => revenueData.byType[month]?.[type] || 0),
+                        backgroundColor: color,
+                        borderColor: color,
+                        borderWidth: 1
+                    };
+                });
+                
+                revenueChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Revenue by Engagement Type'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ₱${context.raw.toFixed(2)}`;
+                                    }
+                                }
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return `₱${value}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Update active button styling
+            document.querySelectorAll('.chart-toggle button').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('btn-outline-primary');
+            });
+            const activeBtn = document.querySelector(`.chart-toggle button[data-type="${type}"]`);
+            activeBtn.classList.remove('btn-outline-primary');
+            activeBtn.classList.add('active');
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function setupChartToggleButtons() {
+            document.querySelectorAll('.chart-toggle button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const chartType = this.getAttribute('data-type');
+                    renderRevenueChart(chartType);
+                });
+            });
         }
 
         document.addEventListener("DOMContentLoaded", loadStatistics);
@@ -74,6 +262,14 @@
         .accepted { background-color: lightgreen; }
         .delivered { background-color: orange; }
         .total { background-color: gray; color: white; }
+        .chart-container { margin-top: 30px; }
+        .chart-toggle .btn { margin-right: 5px; }
+        .chart-toggle .btn.active { 
+            background-color: #003d82; 
+            color: white; 
+            border-color: #003d82;
+        }
+        .chart-toggle { margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -90,7 +286,7 @@
     </nav>
 
     <div class="container mt-4">
-        <h2>Sales Statistics</h2>
+        <h2>Product Sales Analytics</h2>
         <div class="row">
             <div class="col-md-3">
                 <div class="stats-card shipped">
@@ -120,7 +316,18 @@
 
         <canvas id="salesChart" class="mt-4"></canvas>
         
-
+        <div class="chart-container">
+            <h3>Engagement Revenue Analytics</h3>
+            <div class="chart-toggle btn-group">
+                <button class="btn btn-outline-primary active" data-type="line">
+                    <i class="bi bi-graph-up"></i> Time Trend
+                </button>
+                <button class="btn btn-outline-primary" data-type="bar">
+                    <i class="bi bi-bar-chart"></i> By Engagement Type
+                </button>
+            </div>
+            <canvas id="revenueChart"></canvas>
+        </div>
     </div>
 </body>
 </html>
