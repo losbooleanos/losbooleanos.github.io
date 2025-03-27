@@ -38,10 +38,10 @@
                 }
             });
 
-            document.getElementById("shippedSales").innerText = `₱${shippedTotal.toFixed(2)}`;
-            document.getElementById("acceptedSales").innerText = `₱${acceptedTotal.toFixed(2)}`;
-            document.getElementById("deliveredSales").innerText = `₱${deliveredTotal.toFixed(2)}`;
-            document.getElementById("totalSales").innerText = `₱${grandTotal.toFixed(2)}`;
+            document.getElementById("shippedSales").innerText = `₱${shippedTotal.toFixed(2) - 50.00}`;
+            document.getElementById("acceptedSales").innerText = `₱${acceptedTotal.toFixed(2) - 50.00}`;
+            document.getElementById("deliveredSales").innerText = `₱${deliveredTotal.toFixed(2) - 50.00}`;
+            document.getElementById("totalSales").innerText = `₱${grandTotal.toFixed(2) - 50.00}`;
 
             const ctx = document.getElementById("salesChart").getContext("2d");
             new Chart(ctx, {
