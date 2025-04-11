@@ -10,6 +10,36 @@
     <link href="css/bootstrap-icons.css" rel="stylesheet">
     <link href="css/templatemo-kind-heart-charity.css" rel="stylesheet">
     <style>
+        /* Add this to your existing style section */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            border: 3px solid transparent;
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: button-loading-spinner 1s ease infinite;
+        }
+
+        @keyframes button-loading-spinner {
+            from {
+                transform: rotate(0turn);
+            }
+            to {
+                transform: rotate(1turn);
+            }
+        }
         .navbar.bg-light {
             background-color: #0056b3 !important;
         }
@@ -115,6 +145,14 @@
             document.getElementById("contactForm").addEventListener("submit", async function (event) {
                 event.preventDefault();
 
+                        // Get the button element
+                const submitButton = event.target.querySelector('button[type="submit"]');
+                
+                // Set loading state
+                submitButton.classList.add("btn-loading");
+                submitButton.disabled = true;
+                submitButton.innerHTML = "Processing...";
+
                 const name = document.getElementById("name").value;
                 const email = document.getElementById("email").value;
                 const engagementType = document.getElementById("engagementType").value;
@@ -141,7 +179,12 @@
                 } catch (error) {
                     console.error("Error adding document: ", error);
                     alert("Error sending request. Try again.");
-                }
+                } finally {
+            // Always remove loading state whether success or error
+            submitButton.classList.remove("btn-loading");
+            submitButton.disabled = false;
+            submitButton.innerHTML = "Send Request";
+        }
             });
         });
 
